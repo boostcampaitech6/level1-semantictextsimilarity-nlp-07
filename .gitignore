@@ -1,14 +1,14 @@
 ### wandb log ###
-level1-semantictextsimilarity-nlp-07/code/wandb
+code/wandb/
 
 ### lightning_logs ###
-level1-semantictextsimilarity-nlp-07/code/lightning_logs
+code/lightning_logs/
 
 ### personal models ###
-level1-semantictextsimilarity-nlp-07/code/model
+code/model/
 
 ### data ###
-level1-semantictextsimilarity-nlp-07/data
+data/
 
 ### unnecessary files ###
-level1-semantictextsimilarity-nlp-07/code/__pycache__
+code/__pycache__/
