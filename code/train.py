@@ -11,6 +11,7 @@
 # config 쳤을 때 나오는 라인들
 # wandb finish 라인
 # import argparser 삭제
+# 주석을 한 줄 더 달아봤습니다.
 
 
 import random
