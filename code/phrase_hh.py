@@ -60,6 +60,7 @@ def simple_spacing(wrongSent):  # 문장부호 뒤 띄어쓰기
     sent = sent.replace('&',' N ')  # csv의 문장 내에 '&'가 있을 때 오류 존재 => ' N '으로 바꾸기
     return sent
 
+
 from hanspell import spell_checker
 def check_naver(wrongSent):  # 네이버 맞춤법 교정
     # 오류 시 다음 링크 참조: https://github.com/ssut/py-hanspell/issues/41

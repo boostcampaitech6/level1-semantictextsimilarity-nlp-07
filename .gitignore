@@ -12,6 +12,3 @@ data/
 
 ### unnecessary files ###
 code/__pycache__/
-
-### sts venv ###
-sts/

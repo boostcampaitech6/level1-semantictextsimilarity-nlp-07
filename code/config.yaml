@@ -15,8 +15,8 @@ model_params:
   learning_rate: 1e-5
   
 wandb_params:
-  project: 'first project'
+  project: 'heonhyo'
   entity: 'junior-naver'
   allow_val_change: True
   dataset: 'default data'
-  run_name: 'yaml_test' #wandb에 표시될 모델 버전의 이름
+  run_name: 'naver-epoch50' #wandb에 표시될 모델 버전의 이름

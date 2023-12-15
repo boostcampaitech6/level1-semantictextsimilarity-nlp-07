@@ -69,7 +69,7 @@ class Dataloader(pl.LightningDataModule):
             # [SEP] 토큰으로 이어붙여서 전처리합니다.
             #text = '[SEP]'.join([item[text_column] for text_column in self.text_columns])
             text1, text2 = (item[text_column] for text_column in self.text_columns)  # sentence_1, sentence_2 의미
-            text1, text2 = phrase_hh.normalize_soynlp(text1), phrase_hh.normalize_soynlp(text2)  # 반복되는 어구 및 문장부호 삭제
+            text1, text2 = phrase_hh.normalize_soynlp(text1, 2), phrase_hh.normalize_soynlp(text2, 2)  # 반복되는 어구 및 문장부호 삭제
             text1, text2 = phrase_hh.simple_spacing(text1), phrase_hh.simple_spacing(text2)  # 문장부호 다음은 띄어쓰기
             text1, text2 = phrase_hh.check_naver(text1), phrase_hh.check_naver(text2)  # 네이버 맞춤법 검사기로 교정하기
             text = '[SEP]'.join([text1, text2])
