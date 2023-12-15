@@ -51,9 +51,16 @@ def spacing_soynlp(wrongSent, scores):  # 토큰 기반 문장 띄어쓰기 함�
 from soynlp.word import WordExtractor  # 토큰화
 from soynlp.normalizer import *  # 맞춤법 교정
 from soynlp.tokenizer import MaxScoreTokenizer  # 띄어쓰기 교정
+import re
 
 def normalize_soynlp(wrongSent, num_repeats):  # 반복되는 단어 삭제(예: ㅋㅋㅋㅋㅋㅋㅋㅋ => ㅋㅋ)
-    return emoticon_normalize(wrongSent, num_repeats=num_repeats)  
+    sent = emoticon_normalize(wrongSent, num_repeats=num_repeats)
+    sent = re.sub('\.+', '.', sent)
+    sent = re.sub('…+', '.', sent)
+    sent = re.sub(',+', ',', sent)
+    sent = re.sub('\?+', '?', sent)
+    sent = re.sub('!+', '!', sent)
+    return sent
 
 def simple_spacing(wrongSent):  # 문장부호 뒤 띄어쓰기
     sent = wrongSent.replace('.', '. ').replace(',', ', ').replace('?', '? ').replace('!', '! ')  # 문장부호 분리
@@ -73,7 +80,7 @@ if __name__ == '__main__':
     import random
 
     # train.csv 불러오기
-    train_data = pd.read_csv('./data/train.csv')
+    train_data = pd.read_csv('../data/train.csv')
 
     # 인덱스 무작위 재배치
     sent_idx_list = [i for i in range(len(train_data))]
@@ -84,7 +91,7 @@ if __name__ == '__main__':
     label = train_data['label'].values.tolist()
 
     # 무작위 10개만 추리기
-    num_repeats = 1
+    num_repeats = 2
     for idx in sent_idx_list[:10]:
         print("origin sentence_1: ", sentence_1[idx])
         print("origin sentence_2: ", sentence_2[idx],'\n')
