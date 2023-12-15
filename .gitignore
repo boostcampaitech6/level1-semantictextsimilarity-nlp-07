@@ -1,14 +1,14 @@
 ### wandb log ###
-code/wandb
+code/wandb/
 
 ### lightning_logs ###
-code/lightning_logs
+code/lightning_logs/
 
 ### personal models ###
-code/model
+code/model/
 
 ### data ###
-data
+data/
 
 ### unnecessary files ###
-code/__pycache__
+code/__pycache__/
