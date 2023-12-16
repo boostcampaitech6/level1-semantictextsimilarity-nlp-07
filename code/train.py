@@ -1,3 +1,4 @@
+
 # base model에 간단히 wandb를 연동하는 코드 블럭을 추가했습니다.
 # 아직 부족한 부분이 많을 수 있으니, 참고 용도로 사용하시는 걸 추천드립니다.
 # 저도 아직 배우는 중이라, 유용한 코드 수정 사항이나 문제 사항이 있으면 편하게 말씀해주세요!
@@ -11,7 +12,6 @@
 # config 쳤을 때 나오는 라인들
 # wandb finish 라인
 # import argparser 삭제
-
 
 import random
 import wandb
@@ -220,6 +220,14 @@ class Model(pl.LightningModule):
 
 
 if __name__ == '__main__':
+
+    # 경고 제거
+    import warnings
+    transformers.logging.set_verbosity_error()
+    warnings.filterwarnings("ignore", ".*does not have many workers.*")
+    warnings.filterwarnings("ignore", ".*TensorBoard support*")
+    warnings.filterwarnings("ignore", ".*target is close to zero*")
+
     # 하이퍼 파라미터 등 각종 설정값을 입력받습니다
     # 터미널 실행 예시 : python3 run.py --batch_size=64 ...
     # 실행 시 '--batch_size=64' 같은 인자를 입력하지 않으면 default 값이 기본으로 실행됩니다

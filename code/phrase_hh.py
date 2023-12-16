@@ -25,14 +25,15 @@ def remove_punc_and_emoticon(wrongSent):  # 문장부호 및 간단한 이모티
     return sent
 
 def check_naver(wrongSent):  # 네이버 맞춤법 교정
-    # 오류 시 다음 링크 참조: https://github.com/ssut/py-hanspell/issues/41
+    # 오류 시 다음 링크 또는 노션 페이지 참조: https://github.com/ssut/py-hanspell/issues/41
     spelled_sent = spell_checker.check(wrongSent)
     checked_sent = spelled_sent.checked
     return checked_sent
 
-def remove_repeats(wrongSent):  # 문장부호 외 반복되는 단어 제거하기
-    sent = wrongSent
-    return sent
+def check_ques(wrongSent):  # 글첵(https://wikidocs.net/186245) 맞춤법 교정기
+    # https://github.com/ychoi-kr/ko-prfrdr 참고해서 함수 작성해야지~
+    pass
+
 
 if __name__ == '__main__':
     import pandas as pd
