@@ -2,7 +2,4 @@ transformers==4.35.2
 pytorch-lightning==2.1.2
 pandas==2.1.3
 wandb
-konlpy
-soynlp
-git+https://github.com/haven-jeon/PyKoSpacing.git
 git+https://github.com/ssut/py-hanspell.git

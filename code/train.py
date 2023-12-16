@@ -104,7 +104,7 @@ class Dataloader(pl.LightningDataModule):
             # [SEP] 토큰으로 이어붙여서 전처리합니다.
             #text = '[SEP]'.join([item[text_column] for text_column in self.text_columns])
             text1, text2 = (item[text_column] for text_column in self.text_columns)  # sentence_1, sentence_2 의미
-            text1, text2 = phrase_hh.remove_repeats(text1), phrase_hh.remove_repeats(text2)  # 문장부호 및 이모티콘 다듬기
+            text1, text2 = phrase_hh.remove_punc_and_emoticon(text1), phrase_hh.remove_punc_and_emoticon(text2)  # 문장부호 및 이모티콘 다듬기
             text1, text2 = phrase_hh.check_naver(text1), phrase_hh.check_naver(text2)  # 네이버 맞춤법 검사기로 교정하기
             text = '[SEP]'.join([text1, text2])
             outputs = self.tokenizer(text, add_special_tokens=True, padding='max_length', truncation=True)
@@ -164,12 +164,13 @@ class Dataloader(pl.LightningDataModule):
 
 
 class Model(pl.LightningModule):
-    def __init__(self, model_name, lr):
+    def __init__(self, model_name, lr, amsgrad):
         super().__init__()
         self.save_hyperparameters()
 
         self.model_name = model_name
         self.lr = lr
+        self.amsgrad = amsgrad
 
         # 사용할 모델을 호출합니다.
         self.plm = transformers.AutoModelForSequenceClassification.from_pretrained(
@@ -214,7 +215,7 @@ class Model(pl.LightningModule):
         return logits.squeeze()
 
     def configure_optimizers(self):
-        optimizer = torch.optim.AdamW(self.parameters(), lr=self.lr)
+        optimizer = torch.optim.AdamW(self.parameters(), lr=self.lr, amsgrad=self.amsgrad)
         return optimizer
 
 
@@ -226,7 +227,7 @@ if __name__ == '__main__':
     dataloader = Dataloader(config["model_params"]["model_name"], config["model_params"]["batch_size"],
                             config["model_params"]["shuffle"], config["paths"]["train_path"], 
                             config["paths"]["dev_path"],config["paths"]["test_path"],config["paths"]["predict_path"])
-    model = Model(config["model_params"]["model_name"], float(config["model_params"]["learning_rate"]))
+    model = Model(config["model_params"]["model_name"], float(config["model_params"]["learning_rate"]), config["model_params"]["amsgrad"])
 
     # gpu가 없으면 accelerator="cpu"로 변경해주세요, gpu가 여러개면 'devices=4'처럼 사용하실 gpu의 개수를 입력해주세요
     trainer = pl.Trainer(accelerator="gpu", devices=1, max_epochs=config["model_params"]["max_epoch"], log_every_n_steps=1)
