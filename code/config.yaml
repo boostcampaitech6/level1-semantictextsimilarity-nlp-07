@@ -4,7 +4,7 @@ paths:
   dev_path: '../data/dev.csv'
   test_path: '../data/dev.csv'
   predict_path: '../data/test.csv'
-  model_path: './model/model_naver_epoch50.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
+  model_path: './model/model_naver_epoch50_2.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
   output_path: '../data/output/'
 
 model_params: 
@@ -19,4 +19,4 @@ wandb_params:
   entity: 'junior-naver'
   allow_val_change: True
   dataset: 'default data'
-  run_name: 'naver-epoch50' #wandb에 표시될 모델 버전의 이름
+  run_name: 'naver-epoch50-2' #wandb에 표시될 모델 버전의 이름

@@ -4,6 +4,10 @@ from konlpy.tag import Okt
 # PyKoSpacing 설치: pip install git+https://github.com/haven-jeon/PyKoSpacing.git
 from pykospacing import Spacing
 
+# soynlp 설치: pip install soynlp
+from soynlp.word import WordExtractor  # 토큰화
+from soynlp.tokenizer import MaxScoreTokenizer  # 띄어쓰기 교정
+
 def sufflePhrase():  # 문장 내 어구 shuffle하기(미구현)
     None
 
@@ -46,12 +50,12 @@ def spacing_soynlp(wrongSent, scores):  # 토큰 기반 문장 띄어쓰기 함�
     return ' '.join(tokenizer.tokenize(wrongSent))
 
 
-
 # soynlp 설치: pip install soynlp
-from soynlp.word import WordExtractor  # 토큰화
 from soynlp.normalizer import *  # 맞춤법 교정
-from soynlp.tokenizer import MaxScoreTokenizer  # 띄어쓰기 교정
 import re
+
+# hanspell 설치: pip install py-hanspell
+from hanspell import spell_checker
 
 def normalize_soynlp(wrongSent, num_repeats):  # 반복되는 단어 삭제(예: ㅋㅋㅋㅋㅋㅋㅋㅋ => ㅋㅋ)
     sent = emoticon_normalize(wrongSent, num_repeats=num_repeats)
@@ -60,15 +64,15 @@ def normalize_soynlp(wrongSent, num_repeats):  # 반복되는 단어 삭제(예:
     sent = re.sub(',+', ',', sent)
     sent = re.sub('\?+', '?', sent)
     sent = re.sub('!+', '!', sent)
+    sent = re.sub('~+', '~', sent)
+    sent = re.sub(';+', ';', sent)
     return sent
 
 def simple_spacing(wrongSent):  # 문장부호 뒤 띄어쓰기
     sent = wrongSent.replace('.', '. ').replace(',', ', ').replace('?', '? ').replace('!', '! ')  # 문장부호 분리
-    sent = sent.replace('&',' N ')  # csv의 문장 내에 '&'가 있을 때 오류 존재 => ' N '으로 바꾸기
+    sent = sent.replace('&',' N ')  # csv의 문장 내에 '&'가 있을 때 오류 발생 => ' N '으로 바꾸기
     return sent
 
-
-from hanspell import spell_checker
 def check_naver(wrongSent):  # 네이버 맞춤법 교정
     # 오류 시 다음 링크 참조: https://github.com/ssut/py-hanspell/issues/41
     spelled_sent = spell_checker.check(wrongSent)
