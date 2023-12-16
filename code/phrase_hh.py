@@ -5,12 +5,12 @@ import re
 def remove_punc_and_emoticon(wrongSent):  # 문장부호 및 간단한 이모티콘 다듬기
     sent = wrongSent
     # 문장부호 반복 제거 및 문장부호 뒤 띄어쓰기 횟수 획일화
-    punctuations = [r'\.',',',r'\?','!','~',';',':','…']
-    correct_punctuations = ['.',',','?','!','~',';',':','.']
+    punctuations = [r'\.',',',r'\?','!','~',';',':','…',r'\&']
+    correct_punctuations = ['.',',','?','!','~',';',':','.',' N ']
     for idx in range(len(punctuations)):
         sent = re.sub(punctuations[idx]+'+',correct_punctuations[idx],sent)
+        sent = re.sub(' '+punctuations[idx],correct_punctuations[idx],sent)
         sent = re.sub(punctuations[idx]+' +',correct_punctuations[idx],sent)
-    sent = sent.replace("&", " N ")
 
     # 반복되는 이모티콘 언어 제거 및 주변 띄어쓰기 획일화
     emotions = ['ㅋㅋ','ㅎㅎ','ㅜㅜ','ㅠㅠ','ㅡㅡ']
@@ -57,4 +57,3 @@ if __name__ == '__main__':
         print("correct sentence_2:", check_naver(remove_punc_and_emoticon(sentence_2[idx])))
         print("label:", label[idx])
         print("="*20)
-    print("correct sentence:", check_naver(remove_punc_and_emoticon("Q&A")))
