@@ -39,6 +39,14 @@ torch.cuda.manual_seed(0)
 torch.cuda.manual_seed_all(0)
 random.seed(0)
 
+# warning 제거
+import warnings
+
+transformers.logging.set_verbosity_error()
+warnings.filterwarnings("ignore", ".*does not have many workers.*")
+warnings.filterwarnings("ignore", ".*TensorBoard support*")
+warnings.filterwarnings("ignore", ".*target is close to zero*")
+
 #wandb init
 wandb.init(
     # set the wandb project where this run will be logged
