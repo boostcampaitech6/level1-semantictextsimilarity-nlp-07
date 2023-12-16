@@ -1,11 +1,8 @@
-# soynlp 설치: pip install soynlp
-from soynlp.normalizer import *  # 맞춤법 교정
-
 # hanspell 설치: pip install py-hanspell
 from hanspell import spell_checker
 import re
 
-def remove_repeats(wrongSent):  # 반복되는 단어 삭제(예: ㅋㅋㅋㅋㅋㅋㅋㅋ => ㅋㅋ)
+def remove_repeats(wrongSent):  # 문장부호 및 간단한 이모티콘 다듬기
     sent = wrongSent
     # 문장부호 반복 제거 및 문장부호 뒤 띄어쓰기 횟수 획일화
     punctuations = [r'\.',',',r'\?','!','~',';',':','…',r'\&']
@@ -32,8 +29,6 @@ def check_naver(wrongSent):  # 네이버 맞춤법 교정
     spelled_sent = spell_checker.check(wrongSent)
     checked_sent = spelled_sent.checked
     return checked_sent
-
-
 
 
 if __name__ == '__main__':
