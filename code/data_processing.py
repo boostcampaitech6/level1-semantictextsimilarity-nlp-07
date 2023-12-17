@@ -12,7 +12,16 @@ def load_config(config_file):
 
 config = load_config("config.yaml")
 
-df = pd.read_csv(config["paths"]["train_path"])
+########################################################################
+# Down Sampling
+# Down sample the data to 400 where the label equal 0
+########################################################################
+train_df = pd.read_csv(config["paths"]["train_path"])
+df_label_0 = train_df[train_df['label'] == 0]
+df_label_0_sampled = df_label_0.sample(n=400, random_state=0)
+df_label_not_0 = train_df[train_df['label'] != 0]
+df_reduced = pd.concat([df_label_not_0, df_label_0_sampled]).reset_index(drop=True)
+df = df_reduced.sample(frac=1, random_state=0).reset_index(drop=True)
 
 wordnet = {}
 with open("wordnet.pickle", "rb") as f:
@@ -186,7 +195,7 @@ def EDA(sentence, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=2)
 augmented_sentences_1 = []
 augmented_sentences_2 = []
 
-for i in range(0, 9324):
+for i in range(0, len(df.index)):
     augmented_sentences_1.append(EDA(df["sentence_1"][i])[1])
     augmented_sentences_2.append(EDA(df["sentence_2"][i])[1])
           

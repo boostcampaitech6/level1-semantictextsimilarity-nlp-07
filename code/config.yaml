@@ -5,13 +5,13 @@ paths:
   dev_path: '../data/dev.csv'
   test_path: '../data/dev.csv'
   predict_path: '../data/test.csv'
-  model_path: './model/electra-kor-base_L1_lr1e-5_b16_e10.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
-  output_path: '../data/output/electra-kor-base_L1_lr1e-5_b16_e10'
+  model_path: './model/aug_electra-kor-base_L1_lr1e-5_b16_e50.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
+  output_path: '../data/output/aug_electra-kor-base_L1_lr1e-5_b16_e50'
 
 model_params: 
   model_name: 'kykim/electra-kor-base'
   batch_size: 16
-  max_epoch: 10
+  max_epoch: 50
   shuffle: True
   learning_rate: 1e-5
   
@@ -20,4 +20,4 @@ wandb_params:
   entity: 'junior-naver'
   allow_val_change: True
   dataset: 'default data'
-  run_name: 'electra-kor-base_L1_lr1e-5_b16_e10' #wandb에 표시될 모델 버전의 이름
+  run_name: 'aug_electra-kor-base_L1_lr1e-5_b16_e50' #wandb에 표시될 모델 버전의 이름
