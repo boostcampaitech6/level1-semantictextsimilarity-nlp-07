@@ -4,19 +4,19 @@ paths:
   dev_path: '../data/dev.csv'
   test_path: '../data/dev.csv'
   predict_path: '../data/test.csv'
-  model_path: './model/model1.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
-  output_path: '../data/output/'
+  model_path: './model/electra-kor-base_L1_lr1e-5_b16_e10.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
+  output_path: '../data/output/electra-kor-base_L1_lr1e-5_b16_e10.csv'
 
 model_params: 
-  model_name: 'klue/roberta-small'
+  model_name: 'kykim/electra-kor-base'
   batch_size: 16
-  max_epoch: 3
+  max_epoch: 10
   shuffle: True
   learning_rate: 1e-5
   
 wandb_params:
-  project: 'first project'
+  project: 'dayeon_1'
   entity: 'junior-naver'
   allow_val_change: True
   dataset: 'default data'
-  run_name: 'yaml_test' #wandb에 표시될 모델 버전의 이름
+  run_name: 'electra-kor-base_L1_lr1e-5_b16_e10' #wandb에 표시될 모델 버전의 이름
