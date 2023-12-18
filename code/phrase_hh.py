@@ -7,8 +7,11 @@ from pykospacing import Spacing
 
 # soyNLP 설치: 
 from soynlp.word import WordExtractor
-from soynlp.tokenizer import RegexTokenizer, LTokenizer, MaxScoreTokenizer
-import pickle
+from soynlp.normalizer import *
+from soynlp.tokenizer import MaxScoreTokenizer
+
+def remove_repeat(wrongSent, num_repeats=2):  # soynlp 기반 반복되는 어구 제거
+    return emoticon_normalize(wrongSent, num_repeats=num_repeats)
 
 def space_kospacing(wrongSent):  # PyKoSpacing 패키지 기반 띄어쓰기 처리
     spacing = Spacing()
@@ -22,7 +25,7 @@ def remove_punc_and_emoticon(wrongSent):  # 문장부호 및 간단한 이모티
     for idx in range(len(punctuations)):
         sent = re.sub(punctuations[idx]+'+',correct_punctuations[idx],sent)
         sent = re.sub(' '+punctuations[idx],correct_punctuations[idx],sent)
-        sent = re.sub(punctuations[idx]+' +',correct_punctuations[idx],sent)
+        sent = re.sub(punctuations[idx]+' *',correct_punctuations[idx]+" ",sent)
 
     # 반복되는 이모티콘 언어 제거 및 주변 띄어쓰기 획일화
     emoticons = ['ㅋㅋ','ㅎㅎ','ㅜㅜ','ㅠㅠ','ㅡㅡ']
@@ -32,9 +35,6 @@ def remove_punc_and_emoticon(wrongSent):  # 문장부호 및 간단한 이모티
         sent = re.sub(correct_emoticons[idx]+' +',correct_emoticons[idx]+' ',sent)
         sent = re.sub(' *'+correct_emoticons[idx],' '+correct_emoticons[idx],sent)
     return sent
-    sent = wrongSent.replace('.', '. ').replace(',', ', ').replace('?', '? ').replace('!', '! ')  # 문장부호 분리
-    sent = sent.replace('&',' N ')  # csv의 문장 내에 '&'가 있을 때 오류 발생 => ' N '으로 바꾸기
-    return sent
 
 def check_naver(wrongSent):  # 네이버 맞춤법 교정
     # 오류 시 다음 링크 참조: https://github.com/ssut/py-hanspell/issues/41
@@ -43,26 +43,33 @@ def check_naver(wrongSent):  # 네이버 맞춤법 교정
     checked_sent = spelled_sent.checked
     return checked_sent
 
-def space_soynlp(wrongSent):  # soynlp 기반 띄어쓰기 교정
+# 내부 데이터 기반 토크나이징용 말뭉치 score 만들기
+import pandas as pd
+import math
+
+train_data = pd.read_csv('../data/train.csv')
+corpus = []
+corpus += train_data['sentence_1'].to_list()
+corpus += train_data['sentence_2'].to_list()
+
+word_extractor = WordExtractor()
+word_extractor.train(corpus)
+words = word_extractor.extract()
+
+def word_score(score):
+    # 즐겨쓰는 방법 중 하나는 cohesion_forward에 right_branching_entropy를 곱하는 것
+    # (1) 주어진 음절이 유기적으로 연결되어 함께 자주 나타나고,
+    # (2) 그 단어의 우측에 다양한 조사, 어미, 혹은 다른 단어가 등장하여 단어의 우측의 branching entropy가 높다는 의미
+    return (score.cohesion_forward * math.exp(score.right_branching_entropy))
+
+scores_custom = {word: word_score(score) for word, score in words.items()}  # word_score 함수 처리한 점수
+scores_cohesion_forward = {word: score.cohesion_forward for word, score in words.items()}  # cohesion_forward 점수
+scores_right_branching_entropy = {word: score.right_branching_entropy for word, score in words.items()}  # right_branching_entropy 점수
+
+def space_soynlp(wrongSent, scores=scores_custom):  # soynlp 기반 띄어쓰기 교정
     # https://github.com/lovit/soynlp/blob/master/tutorials/wordextractor_lecture.ipynb
-    import math
-    def word_score(score):
-        # 즐겨쓰는 방법 중 하나는 cohesion_forward에 right_branching_entropy를 곱하는 것
-        # (1) 주어진 글자가 유기적으로 연결되어 함께 자주 나타나고,
-        # (2) 그 단어의 우측에 다양한 조사, 어미, 혹은 다른 단어가 등장하여 단어의 우측의 branching entropy가 높다는 의미
-        return (score.cohesion_forward * math.exp(score.right_branching_entropy))
-    
-    word_score_tables = None
-    with open("soynlp_word_score_tables_hh.pickle","rb") as f:
-        word_score_tables = pickle.load(f)
-    
-    word_score_table1 = word_score_tables[0]  # cohesion_forward 점수와 right_branching_entropy 점수를 조합한 함수
-    word_score_table2 = word_score_tables[1]  # cohesion_forward 점수
-    word_score_table3 = word_score_tables[2]  # right_branching_entropy 점수
-
-    maxscore_tokenizer = MaxScoreTokenizer(scores=word_score_table1)
+    maxscore_tokenizer = MaxScoreTokenizer(scores=scores)
     return ' '.join(maxscore_tokenizer.tokenize(wrongSent))
-
 
 def check_geulcheck(wrongSent):  # 글첵(https://wikidocs.net/186245) 맞춤법 교정기(진행 중)
     # https://github.com/ychoi-kr/ko-prfrdr 참고해서 함수 작성해야지~
