@@ -4,24 +4,11 @@ import pickle
 import re
 import yaml
 
+from code.config import load_config
 
-def load_config(config_file):
-    with open(config_file) as file:
-        config = yaml.safe_load(file)
-    return config
 
 config = load_config("config.yaml")
 
-########################################################################
-# Down Sampling
-# Down sample the data to 400 where the label equal 0
-########################################################################
-train_df = pd.read_csv(config["paths"]["train_path"])
-df_label_0 = train_df[train_df['label'] == 0]
-df_label_0_sampled = df_label_0.sample(n=400, random_state=0)
-df_label_not_0 = train_df[train_df['label'] != 0]
-df_reduced = pd.concat([df_label_not_0, df_label_0_sampled]).reset_index(drop=True)
-df = df_reduced.sample(frac=1, random_state=0).reset_index(drop=True)
 
 wordnet = {}
 with open("wordnet.pickle", "rb") as f:
@@ -204,4 +191,4 @@ df_2 = pd.DataFrame({'id': df["id"], 'source': df["source"], "sentence_1" : augm
 
 df = pd.concat([df, df_2], ignore_index = True)
 
-df.to_csv(config["paths"]["train_aug_path"])
+df.to_csv(config["paths"]["train_aug_path"], index=False)

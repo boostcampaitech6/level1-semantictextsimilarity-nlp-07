@@ -23,14 +23,9 @@ import transformers
 import torch
 import torchmetrics
 import pytorch_lightning as pl
+from config import load_config
 
 # config file 세팅
-import yaml
-def load_config(config_file):
-    with open(config_file) as file:
-        config = yaml.safe_load(file)
-    return config
-
 config = load_config("config.yaml")
 
 # seed 고정
