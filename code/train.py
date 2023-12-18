@@ -11,8 +11,6 @@
 # config 쳤을 때 나오는 라인들
 # wandb finish 라인
 # import argparser 삭제
-# 주석을 한 줄 더 달아봤습니다.
-
 
 import random
 import wandb
@@ -52,6 +50,7 @@ wandb.init(
     "model": config["model_params"]["model_name"],
     "dataset": config["wandb_params"]["dataset"],
     "epochs": config["model_params"]["max_epoch"],
+    "loss": config["wandb_params"]["loss"],
     }
 )
 wandb.run.name = config["wandb_params"]["run_name"]
@@ -170,7 +169,7 @@ class Model(pl.LightningModule):
         self.plm = transformers.AutoModelForSequenceClassification.from_pretrained(
             pretrained_model_name_or_path=model_name, num_labels=1)
         # Loss 계산을 위해 사용될 L1Loss를 호출합니다.
-        self.loss_func = torch.nn.L1Loss()
+        self.loss_func = torch.nn.MSELoss()
 
     def forward(self, x):
         x = self.plm(x)['logits']
