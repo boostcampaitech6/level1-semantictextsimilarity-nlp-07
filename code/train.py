@@ -10,7 +10,7 @@
 # wandb log 찍는 라인들
 # config 쳤을 때 나오는 라인들
 # wandb finish 라인
-# import argparser 삭제
+# import argparser 삭제 
 
 
 import random
