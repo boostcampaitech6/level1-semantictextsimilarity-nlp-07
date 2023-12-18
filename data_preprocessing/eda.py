@@ -4,10 +4,13 @@ import pickle
 import re
 import yaml
 
-from code.config import load_config
+import yaml
+def load_config(config_file):
+    with open(config_file) as file:
+        config = yaml.safe_load(file)
+    return config
 
-
-config = load_config("config.yaml")
+config = load_config("/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/code/config.yaml")
 
 
 wordnet = {}
