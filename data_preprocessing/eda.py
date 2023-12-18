@@ -12,7 +12,6 @@ def load_config(config_file):
 
 config = load_config("/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/code/config.yaml")
 
-
 wordnet = {}
 with open("wordnet.pickle", "rb") as f:
 	wordnet = pickle.load(f)
@@ -182,16 +181,18 @@ def EDA(sentence, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=2)
 
 	return augmented_sentences
 
-augmented_sentences_1 = []
-augmented_sentences_2 = []
+def eda_aug(df):
+	augmented_sentences_1 = []
+	augmented_sentences_2 = []
+	df_len = len(df.index)
 
-for i in range(0, len(df.index)):
-    augmented_sentences_1.append(EDA(df["sentence_1"][i])[1])
-    augmented_sentences_2.append(EDA(df["sentence_2"][i])[1])
-          
-df_2 = pd.DataFrame({'id': df["id"], 'source': df["source"], "sentence_1" : augmented_sentences_1, "sentence_2" : augmented_sentences_2,
-                        "label": df["label"], "binary-label" : df["binary-label"]})
+	for i in range(0, df_len):
+		augmented_sentences_1.append(EDA(df["sentence_1"][i])[1])
+		augmented_sentences_2.append(EDA(df["sentence_2"][i])[1])
+			
+	df_2 = pd.DataFrame({'id': df["id"], 'source': df["source"], "sentence_1" : augmented_sentences_1, "sentence_2" : augmented_sentences_2,
+							"label": df["label"], "binary-label" : df["binary-label"]})
 
-df = pd.concat([df, df_2], ignore_index = True)
+	df = pd.concat([df, df_2], ignore_index = True)
 
-df.to_csv(config["paths"]["train_aug_path"], index=False)
+	return df
