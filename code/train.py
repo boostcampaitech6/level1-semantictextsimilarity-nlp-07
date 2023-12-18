@@ -23,6 +23,8 @@ import torch
 import torchmetrics
 import pytorch_lightning as pl
 
+import phrase_hh
+
 # config file 세팅
 import yaml
 def load_config(config_file):
@@ -99,8 +101,10 @@ class Dataloader(pl.LightningDataModule):
     def tokenizing(self, dataframe):
         data = []
         for idx, item in tqdm(dataframe.iterrows(), desc='tokenizing', total=len(dataframe)):
-            # 두 입력 문장을 [SEP] 토큰으로 이어붙여서 전처리합니다.
-            text = '[SEP]'.join([item[text_column] for text_column in self.text_columns])
+            text1, text2 = (item[text_column] for text_column in self.text_columns)  # sentence_1, sentence_2 의미
+            text1, text2 = phrase_hh.remove_punc_and_emoticon(text1), phrase_hh.remove_punc_and_emoticon(text2)  # 문장부호 및 이모티콘 다듬기
+            text1, text2 = phrase_hh.check_naver(text1), phrase_hh.check_naver(text2)  # 네이버 맞춤법 검사기로 교정하기
+            text = '[SEP]'.join([text1, text2])
             outputs = self.tokenizer(text, add_special_tokens=True, padding='max_length', truncation=True)
             data.append(outputs['input_ids'])
         return data

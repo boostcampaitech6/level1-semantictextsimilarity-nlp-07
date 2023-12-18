@@ -4,11 +4,11 @@ paths:
   dev_path: '../data/dev.csv'
   test_path: '../data/dev.csv'
   predict_path: '../data/test.csv'
-  model_path: './model/klue-sentence-roberta-kornlu_mse.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
+  model_path: './model/kykim-electra-kor-base-heunhyo-EDA.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
   output_path: '../data/output/'
 
 model_params: 
-  model_name: 'bespin-global/klue-sentence-roberta-base-kornlu'
+  model_name: 'kykim/electra-kor-base'
   batch_size: 16
   max_epoch: 50
   shuffle: True
@@ -19,5 +19,5 @@ wandb_params:
   entity: 'junior-naver'
   allow_val_change: True
   dataset: 'default data'
-  run_name: 'klue-sentence-roberta-kornlu-mse' #wandb에 표시될 모델 버전의 이름
+  run_name: 'kykim-electra-kor-base-heunhyo EDA' #wandb에 표시될 모델 버전의 이름
   loss: 'mse'
