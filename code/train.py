@@ -1,3 +1,4 @@
+
 # base model에 간단히 wandb를 연동하는 코드 블럭을 추가했습니다.
 # 아직 부족한 부분이 많을 수 있으니, 참고 용도로 사용하시는 걸 추천드립니다.
 # 저도 아직 배우는 중이라, 유용한 코드 수정 사항이나 문제 사항이 있으면 편하게 말씀해주세요!
@@ -24,6 +25,13 @@ import torch
 import torchmetrics
 import pytorch_lightning as pl
 from config import load_config
+
+# 경고 제거
+import warnings
+transformers.logging.set_verbosity_error()
+warnings.filterwarnings("ignore", ".*does not have many workers.*")
+warnings.filterwarnings("ignore", ".*TensorBoard support*")
+warnings.filterwarnings("ignore", ".*target is close to zero*")
 
 # config file 세팅
 config = load_config("config.yaml")
@@ -100,10 +108,16 @@ class Dataloader(pl.LightningDataModule):
         self.text_columns = ['sentence_1', 'sentence_2']
 
     def tokenizing(self, dataframe):
+        import phrase_hh
         data = []
         for idx, item in tqdm(dataframe.iterrows(), desc='tokenizing', total=len(dataframe)):
-            # 두 입력 문장을 [SEP] 토큰으로 이어붙여서 전처리합니다.
-            text = '[SEP]'.join([item[text_column] for text_column in self.text_columns])
+            # 두 입력 문장을 정규화(교정)한 후,
+            # [SEP] 토큰으로 이어붙여서 전처리합니다.
+            #text = '[SEP]'.join([item[text_column] for text_column in self.text_columns])
+            text1, text2 = (item[text_column] for text_column in self.text_columns)  # sentence_1, sentence_2 의미
+            text1, text2 = phrase_hh.remove_punc_and_emoticon(text1), phrase_hh.remove_punc_and_emoticon(text2)  # 문장부호 및 이모티콘 다듬기
+            text1, text2 = phrase_hh.space_soynlp(text1), phrase_hh.space_soynlp(text2)  # soynlp 기반 
+            text = '[SEP]'.join([text1, text2])
             outputs = self.tokenizer(text, add_special_tokens=True, padding='max_length', truncation=True)
             data.append(outputs['input_ids'])
         return data
@@ -214,10 +228,13 @@ class Model(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = torch.optim.AdamW(self.parameters(), lr=self.lr)
+        # AdamW 대신 NAdam 넣기
+        #optimizer = torch.optim.NAdam(self.parameters(), lr=self.lr)
         return optimizer
 
 
 if __name__ == '__main__':
+
     # 하이퍼 파라미터 등 각종 설정값을 입력받습니다
     # 터미널 실행 예시 : python3 run.py --batch_size=64 ...
     # 실행 시 '--batch_size=64' 같은 인자를 입력하지 않으면 default 값이 기본으로 실행됩니다
