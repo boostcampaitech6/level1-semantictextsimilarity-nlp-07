@@ -243,7 +243,7 @@ if __name__ == '__main__':
     # 실행 시 '--batch_size=64' 같은 인자를 입력하지 않으면 default 값이 기본으로 실행됩니다
     # dataloader와 model을 생성합니다.
     dataloader = Dataloader(config["model_params"]["model_name"], config["model_params"]["batch_size"],
-                            config["model_params"]["shuffle"], config["paths"]["train_path"], 
+                            config["model_params"]["shuffle"], config["paths"]["train_aug_path"], 
                             config["paths"]["dev_path"],config["paths"]["test_path"],config["paths"]["predict_path"])
     model = Model(config["model_params"]["model_name"], float(config["model_params"]["learning_rate"]))
 
