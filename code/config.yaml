@@ -5,7 +5,7 @@ paths:
   dev_path: '../data/processed_dev.csv'
   test_path: '../data/processed_dev.csv'
   predict_path: '../data/test.csv'
-  model_path: './model/kykim_electra-kor-base_L1_lr1e-5_b16_e50.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
+  model_path: './model/kykim_electra-kor-base_L1_lr1e-5_b16_e50_nadam.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
   output_path: '../data/output/'
 
 model_params: 
@@ -16,8 +16,8 @@ model_params:
   learning_rate: 1e-5
   
 wandb_params:
-  project: 'dayeon_1'
+  project: 'heonhyo'
   entity: 'junior-naver'
   allow_val_change: True
   dataset: 'default data'
-  run_name: 'kykim_electra-kor-base_L1_lr1e-5_b16_e50' #wandb에 표시될 모델 버전의 이름
+  run_name: 'kykim_electra-kor-base_L1_lr1e-5_b16_e50_nadam' #wandb에 표시될 모델 버전의 이름

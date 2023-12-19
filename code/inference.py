@@ -209,6 +209,8 @@ if __name__ == '__main__':
 
     # 예측된 결과를 형식에 맞게 반올림하여 준비합니다.
     predictions = list(round(float(i), 1) for i in torch.cat(predictions))
+    predictions = [0.0 if i<=0.0 else i for i in predictions]
+    predictions = [5.0 if i>5.0 else i for i in predictions]
 
     # output 형식을 불러와서 예측된 결과로 바꿔주고, run_name+output.csv로 출력합니다.
     output = pd.read_csv('../data/sample_submission.csv')
