@@ -15,8 +15,8 @@ import pytorch_lightning as pl
 import os
 import sys
 
-sys.path.append('/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/code/data_preprocessing')
-import grammar_check
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+from data_preprocessing import grammar_check
 
 # config file 세팅
 import yaml

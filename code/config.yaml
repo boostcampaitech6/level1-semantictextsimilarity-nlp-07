@@ -6,7 +6,7 @@ paths:
   test_path: '../data/processed_dev.csv'
   predict_path: '../data/test.csv'
   model_path: './model/kykim_electra-kor-base_L1_lr1e-5_b16_e50.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
-  output_path: '../data/output/kykim_electra-kor-base_L1_lr1e-5_b16_e50'
+  output_path: '../data/output/'
 
 model_params: 
   model_name: 'kykim/electra-kor-base'
