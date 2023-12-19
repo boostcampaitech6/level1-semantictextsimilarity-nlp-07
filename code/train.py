@@ -1,8 +1,21 @@
+
+# base model에 간단히 wandb를 연동하는 코드 블럭을 추가했습니다.
+# 아직 부족한 부분이 많을 수 있으니, 참고 용도로 사용하시는 걸 추천드립니다.
+# 저도 아직 배우는 중이라, 유용한 코드 수정 사항이나 문제 사항이 있으면 편하게 말씀해주세요!
+
+# pip install pyyaml으로 패키지를 설치 후 yaml에 접근할 수 있습니다.
+
 ############# 수정한 코드 list #############
 # config file 세팅 블록
+# wandb init 블록
+# wandb log 찍는 라인들
 # config 쳤을 때 나오는 라인들
+# wandb finish 라인
 # import argparser 삭제
 
+
+import random
+import wandb
 import pandas as pd
 
 from tqdm.auto import tqdm
@@ -26,6 +39,37 @@ def load_config(config_file):
     return config
 
 config = load_config("config.yaml")
+
+# seed 고정
+torch.manual_seed(0)
+torch.cuda.manual_seed(0)
+torch.cuda.manual_seed_all(0)
+random.seed(0)
+
+# warning 제거
+import warnings
+
+transformers.logging.set_verbosity_error()
+warnings.filterwarnings("ignore", ".*does not have many workers.*")
+warnings.filterwarnings("ignore", ".*TensorBoard support*")
+warnings.filterwarnings("ignore", ".*target is close to zero*")
+
+#wandb init
+wandb.init(
+    # set the wandb project where this run will be logged
+    project=config["wandb_params"]["project"],
+    entity=config["wandb_params"]["entity"],
+    allow_val_change=True,
+    # track hyperparameters and run metadata
+    config={
+    "learning_rate": float(config["model_params"]["learning_rate"]),
+    "model": config["model_params"]["model_name"],
+    "dataset": config["wandb_params"]["dataset"],
+    "epochs": config["model_params"]["max_epoch"],
+    }
+)
+wandb.run.name = config["wandb_params"]["run_name"]
+wandb.run.save()
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, inputs, targets=[]):
@@ -68,7 +112,6 @@ class Dataloader(pl.LightningDataModule):
         self.text_columns = ['sentence_1', 'sentence_2']
 
     def tokenizing(self, dataframe):
-        import grammar_check
         data = []
         for idx, item in tqdm(dataframe.iterrows(), desc='tokenizing', total=len(dataframe)):
             # 두 입력 문장을 정규화(교정)한 후,
@@ -121,7 +164,7 @@ class Dataloader(pl.LightningDataModule):
             self.predict_dataset = Dataset(predict_inputs, [])
 
     def train_dataloader(self):
-        return torch.utils.data.DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=config['model_params']['shuffle'])
+        return torch.utils.data.DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=config["model_params"]["shuffle"])
 
     def val_dataloader(self):
         return torch.utils.data.DataLoader(self.val_dataset, batch_size=self.batch_size)
@@ -157,7 +200,7 @@ class Model(pl.LightningModule):
         logits = self(x)
         loss = self.loss_func(logits, y.float())
         self.log("train_loss", loss)
-
+        wandb.log({"Training loss": loss}, step=self.current_epoch)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -165,9 +208,10 @@ class Model(pl.LightningModule):
         logits = self(x)
         loss = self.loss_func(logits, y.float())
         self.log("val_loss", loss)
-
+        wandb.log({"validation loss": loss}, step=self.current_epoch)
         self.log("val_pearson", torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze()))
-
+        wandb.log({"validation pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())},
+                   step=self.current_epoch)
         return loss
 
     def test_step(self, batch, batch_idx):
@@ -175,6 +219,8 @@ class Model(pl.LightningModule):
         logits = self(x)
 
         self.log("test_pearson", torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze()))
+        wandb.log({"test_pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())},
+                    step=self.current_epoch)
 
     def predict_step(self, batch, batch_idx):
         x = batch
@@ -190,27 +236,27 @@ class Model(pl.LightningModule):
 
 
 if __name__ == '__main__':
+
     # 하이퍼 파라미터 등 각종 설정값을 입력받습니다
     # 터미널 실행 예시 : python3 run.py --batch_size=64 ...
     # 실행 시 '--batch_size=64' 같은 인자를 입력하지 않으면 default 값이 기본으로 실행됩니다
-
     # dataloader와 model을 생성합니다.
     dataloader = Dataloader(config["model_params"]["model_name"], config["model_params"]["batch_size"],
                             config["model_params"]["shuffle"], config["paths"]["train_path"], 
                             config["paths"]["dev_path"],config["paths"]["test_path"],config["paths"]["predict_path"])
+    model = Model(config["model_params"]["model_name"], float(config["model_params"]["learning_rate"]))
 
-    # gpu가 없으면 'gpus=0'을, gpu가 여러개면 'gpus=4'처럼 사용하실 gpu의 개수를 입력해주세요
+    # gpu가 없으면 accelerator="cpu"로 변경해주세요, gpu가 여러개면 'devices=4'처럼 사용하실 gpu의 개수를 입력해주세요
     trainer = pl.Trainer(accelerator="gpu", devices=1, max_epochs=config["model_params"]["max_epoch"], log_every_n_steps=1)
 
-    # Inference part
-    # 저장된 모델로 예측을 진행합니다.
-    model = torch.load(config["paths"]["model_path"])
-    predictions = trainer.predict(model=model, datamodule=dataloader)
+    # Train part
+    trainer.fit(model=model, datamodule=dataloader)
+    trainer.test(model=model, datamodule=dataloader)
 
-    # 예측된 결과를 형식에 맞게 반올림하여 준비합니다.
-    predictions = list(round(float(i), 1) for i in torch.cat(predictions))
+    # 학습이 완료된 모델을 저장합니다.
+    torch.save(model, config["paths"]["model_path"])
 
-    # output 형식을 불러와서 예측된 결과로 바꿔주고, run_name+output.csv로 출력합니다.
-    output = pd.read_csv('../data/sample_submission.csv')
-    output['target'] = predictions
-    output.to_csv(config["paths"]["output_path"]+config["wandb_params"]["run_name"]+'_output.csv', index=False)
+    # [optional] finish the wandb run, necessary in notebooks
+    wandb.finish()
+
+    
