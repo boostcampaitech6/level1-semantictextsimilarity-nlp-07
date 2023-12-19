@@ -173,7 +173,7 @@ class Model(pl.LightningModule):
         self.plm = transformers.AutoModelForSequenceClassification.from_pretrained(
             pretrained_model_name_or_path=model_name, num_labels=1)
         # Loss 계산을 위해 사용될 L1Loss를 호출합니다.
-        self.loss_func = torch.nn.MSELoss()
+        self.loss_func = torch.nn.L1Loss()
 
     def forward(self, x):
         x = self.plm(x)['logits']
@@ -185,7 +185,7 @@ class Model(pl.LightningModule):
         logits = self(x)
         loss = self.loss_func(logits, y.float())
         self.log("train_loss", loss)
-        wandb.log({"Training loss": loss})
+        wandb.log({"Training loss": loss}, step=self.current_epoch)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -193,9 +193,9 @@ class Model(pl.LightningModule):
         logits = self(x)
         loss = self.loss_func(logits, y.float())
         self.log("val_loss", loss)
-        wandb.log({"validation loss": loss})
+        wandb.log({"validation loss": loss}, step=self.current_epoch)
         self.log("val_pearson", torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze()))
-        wandb.log({"validation pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())})
+        wandb.log({"validation pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())}, step=self.current_epoch)
         return loss
 
     def test_step(self, batch, batch_idx):
@@ -222,8 +222,8 @@ if __name__ == '__main__':
     # 실행 시 '--batch_size=64' 같은 인자를 입력하지 않으면 default 값이 기본으로 실행됩니다
     # dataloader와 model을 생성합니다.
     dataloader = Dataloader(config["model_params"]["model_name"], config["model_params"]["batch_size"],
-                            config["model_params"]["shuffle"], config["paths"]["train_path"], 
-                            config["paths"]["dev_path"],config["paths"]["test_path"],config["paths"]["predict_path"])
+                            config["model_params"]["shuffle"], config["paths"]["train_aug_path"], 
+                            config["paths"]["dev_aug_path"],config["paths"]["test_aug_path"],config["paths"]["predict_path"])
     model = Model(config["model_params"]["model_name"], float(config["model_params"]["learning_rate"]))
 
     # gpu가 없으면 accelerator="cpu"로 변경해주세요, gpu가 여러개면 'devices=4'처럼 사용하실 gpu의 개수를 입력해주세요
