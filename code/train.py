@@ -32,32 +32,6 @@ def load_config(config_file):
         config = yaml.safe_load(file)
     return config
 
-config = load_config("config.yaml")
-
-# seed 고정
-torch.manual_seed(0)
-torch.cuda.manual_seed(0)
-torch.cuda.manual_seed_all(0)
-random.seed(0)
-
-#wandb init
-wandb.init(
-    # set the wandb project where this run will be logged
-    project=config["wandb_params"]["project"],
-    entity=config["wandb_params"]["entity"],
-    allow_val_change=True,
-    # track hyperparameters and run metadata
-    config={
-    "learning_rate": float(config["model_params"]["learning_rate"]),
-    "model": config["model_params"]["model_name"],
-    "dataset": config["wandb_params"]["dataset"],
-    "epochs": config["model_params"]["max_epoch"],
-    "loss": config["wandb_params"]["loss"],
-    }
-)
-wandb.run.name = config["wandb_params"]["run_name"]
-wandb.run.save()
-
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, inputs, targets=[]):
         self.inputs = inputs
@@ -217,27 +191,58 @@ class Model(pl.LightningModule):
         return optimizer
 
 
+
+
+
+
 if __name__ == '__main__':
-    # 하이퍼 파라미터 등 각종 설정값을 입력받습니다
-    # 터미널 실행 예시 : python3 run.py --batch_size=64 ...
-    # 실행 시 '--batch_size=64' 같은 인자를 입력하지 않으면 default 값이 기본으로 실행됩니다
-    # dataloader와 model을 생성합니다.
-    dataloader = Dataloader(config["model_params"]["model_name"], config["model_params"]["batch_size"],
-                            config["model_params"]["shuffle"], config["paths"]["train_path"], 
-                            config["paths"]["dev_path"],config["paths"]["test_path"],config["paths"]["predict_path"])
-    model = Model(config["model_params"]["model_name"], float(config["model_params"]["learning_rate"]))
+    for i in range(1,5):
+        config = load_config(f"config_{i}.yaml")
 
-    # gpu가 없으면 accelerator="cpu"로 변경해주세요, gpu가 여러개면 'devices=4'처럼 사용하실 gpu의 개수를 입력해주세요
-    trainer = pl.Trainer(accelerator="gpu", devices=1, max_epochs=config["model_params"]["max_epoch"], log_every_n_steps=1)
+        # seed 고정
+        torch.manual_seed(0)
+        torch.cuda.manual_seed(0)
+        torch.cuda.manual_seed_all(0)
+        random.seed(0)
 
-    # Train part
-    trainer.fit(model=model, datamodule=dataloader)
-    trainer.test(model=model, datamodule=dataloader)
+        #wandb init
+        wandb.init(
+            # set the wandb project where this run will be logged
+            project=config["wandb_params"]["project"],
+            entity=config["wandb_params"]["entity"],
+            allow_val_change=True,
+            # track hyperparameters and run metadata
+            config={
+            "learning_rate": float(config["model_params"]["learning_rate"]),
+            "model": config["model_params"]["model_name"],
+            "dataset": config["wandb_params"]["dataset"],
+            "epochs": config["model_params"]["max_epoch"],
+            "loss": config["wandb_params"]["loss"],
+            }
+        )
+        wandb.run.name = config["wandb_params"]["run_name"]
+        wandb.run.save()
 
-    # 학습이 완료된 모델을 저장합니다.
-    torch.save(model, config["paths"]["model_path"])
+        # 하이퍼 파라미터 등 각종 설정값을 입력받습니다
+        # 터미널 실행 예시 : python3 run.py --batch_size=64 ...
+        # 실행 시 '--batch_size=64' 같은 인자를 입력하지 않으면 default 값이 기본으로 실행됩니다
+        # dataloader와 model을 생성합니다.
+        dataloader = Dataloader(config["model_params"]["model_name"], config["model_params"]["batch_size"],
+                                config["model_params"]["shuffle"], config["paths"]["train_path"], 
+                                config["paths"]["dev_path"],config["paths"]["test_path"],config["paths"]["predict_path"])
+        model = Model(config["model_params"]["model_name"], float(config["model_params"]["learning_rate"]))
 
-    # [optional] finish the wandb run, necessary in notebooks
-    wandb.finish()
+        # gpu가 없으면 accelerator="cpu"로 변경해주세요, gpu가 여러개면 'devices=4'처럼 사용하실 gpu의 개수를 입력해주세요
+        trainer = pl.Trainer(accelerator="gpu", devices=1, max_epochs=config["model_params"]["max_epoch"], log_every_n_steps=1)
+
+        # Train part
+        trainer.fit(model=model, datamodule=dataloader)
+        trainer.test(model=model, datamodule=dataloader)
+
+        # 학습이 완료된 모델을 저장합니다.
+        torch.save(model, config["paths"]["model_path"])
+
+        # [optional] finish the wandb run, necessary in notebooks
+        wandb.finish()
 
     
