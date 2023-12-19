@@ -203,7 +203,8 @@ class Model(pl.LightningModule):
         logits = self(x)
 
         self.log("test_pearson", torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze()))
-        wandb.log({"test_pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())})
+        wandb.log({"test_pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())},
+                   step=self.current_epoch)
 
     def predict_step(self, batch, batch_idx):
         x = batch

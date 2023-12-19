@@ -24,8 +24,8 @@ train_df = train_df[~train_df.index.isin(add_df.index)].reset_index()
 val_df = pd.concat([val_df, add_df], ignore_index=True)
 
 # data preprocessing
-train_df = data_processing.preprocessing(train_df)
-val_df = data_processing.preprocessing(val_df)
+# train_df = data_processing.preprocessing(train_df)
+# val_df = data_processing.preprocessing(val_df)
 
 # data save
 train_df.to_csv('/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/data/processed_train.csv', index=False)
