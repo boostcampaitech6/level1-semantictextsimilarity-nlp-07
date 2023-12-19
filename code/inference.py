@@ -46,13 +46,13 @@ class Dataset(torch.utils.data.Dataset):
 
 
 class Dataloader(pl.LightningDataModule):
-    def __init__(self, model_name, batch_size, shuffle, train_path, dev_path, test_path, predict_path):
+    def __init__(self, model_name, batch_size, shuffle, train_aug_path, dev_path, test_path, predict_path):
         super().__init__()
         self.model_name = model_name
         self.batch_size = batch_size
         self.shuffle = shuffle
 
-        self.train_path = train_path
+        self.train_aug_path = train_aug_path
         self.dev_path = dev_path
         self.test_path = test_path
         self.predict_path = predict_path
@@ -68,7 +68,6 @@ class Dataloader(pl.LightningDataModule):
         self.text_columns = ['sentence_1', 'sentence_2']
 
     def tokenizing(self, dataframe):
-        import grammar_check
         data = []
         for idx, item in tqdm(dataframe.iterrows(), desc='tokenizing', total=len(dataframe)):
             # 두 입력 문장을 정규화(교정)한 후,
@@ -98,7 +97,7 @@ class Dataloader(pl.LightningDataModule):
     def setup(self, stage='fit'):
         if stage == 'fit':
             # 학습 데이터와 검증 데이터셋을 호출합니다
-            train_data = pd.read_csv(self.train_path)
+            train_data = pd.read_csv(self.train_aug_path)
             val_data = pd.read_csv(self.dev_path)
 
             # 학습데이터 준비
@@ -196,7 +195,7 @@ if __name__ == '__main__':
 
     # dataloader와 model을 생성합니다.
     dataloader = Dataloader(config["model_params"]["model_name"], config["model_params"]["batch_size"],
-                            config["model_params"]["shuffle"], config["paths"]["train_path"], 
+                            config["model_params"]["shuffle"], config["paths"]["train_aug_path"], 
                             config["paths"]["dev_path"],config["paths"]["test_path"],config["paths"]["predict_path"])
 
     # gpu가 없으면 'gpus=0'을, gpu가 여러개면 'gpus=4'처럼 사용하실 gpu의 개수를 입력해주세요
