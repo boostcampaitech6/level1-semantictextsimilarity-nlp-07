@@ -195,7 +195,7 @@ class Model(pl.LightningModule):
         logits = self(x)
         loss = self.loss_func(logits, y.float())
         self.log("train_loss", loss)
-        wandb.log({"Training loss": loss})
+        wandb.log({"Training loss": loss}, step=self.current_epoch)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -203,9 +203,10 @@ class Model(pl.LightningModule):
         logits = self(x)
         loss = self.loss_func(logits, y.float())
         self.log("val_loss", loss)
-        wandb.log({"validation loss": loss})
+        wandb.log({"validation loss": loss}, step=self.current_epoch)
         self.log("val_pearson", torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze()))
-        wandb.log({"validation pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())})
+        wandb.log({"validation pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())},
+                   step=self.current_epoch)
         return loss
 
     def test_step(self, batch, batch_idx):
@@ -213,7 +214,8 @@ class Model(pl.LightningModule):
         logits = self(x)
 
         self.log("test_pearson", torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze()))
-        wandb.log({"test_pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())})
+        wandb.log({"test_pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())},
+                    step=self.current_epoch)
 
     def predict_step(self, batch, batch_idx):
         x = batch
