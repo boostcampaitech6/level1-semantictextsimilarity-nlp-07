@@ -183,8 +183,8 @@ if __name__ == '__main__':
 
     # dataloader와 model을 생성합니다.
     dataloader = Dataloader(config["model_params"]["model_name"], config["model_params"]["batch_size"],
-                            config["model_params"]["shuffle"], config["paths"]["train_aug_path"], 
-                            config["paths"]["dev_aug_path"],config["paths"]["test_aug_path"],config["paths"]["predict_path"])
+                            config["model_params"]["shuffle"], config["paths"]["train_path"], 
+                            config["paths"]["dev_path"],config["paths"]["test_path"],config["paths"]["predict_path"])
 
     # gpu가 없으면 'gpus=0'을, gpu가 여러개면 'gpus=4'처럼 사용하실 gpu의 개수를 입력해주세요
     trainer = pl.Trainer(accelerator="gpu", devices=1, max_epochs=config["model_params"]["max_epoch"], log_every_n_steps=1)
