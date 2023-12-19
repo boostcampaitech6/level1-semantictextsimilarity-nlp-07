@@ -46,6 +46,7 @@ wandb.init(
     entity=config["wandb_params"]["entity"],
     allow_val_change=True,
     # track hyperparameters and run metadata
+
     config={
     "learning_rate": float(config["model_params"]["learning_rate"]),
     "model": config["model_params"]["model_name"],
@@ -75,13 +76,13 @@ class Dataset(torch.utils.data.Dataset):
 
 
 class Dataloader(pl.LightningDataModule):
-    def __init__(self, model_name, batch_size, shuffle, train_path, dev_path, test_path, predict_path):
+    def __init__(self, model_name, batch_size, shuffle, train_aug_path, dev_path, test_path, predict_path):
         super().__init__()
         self.model_name = model_name
         self.batch_size = batch_size
         self.shuffle = shuffle
 
-        self.train_path = train_path
+        self.train_aug_path = train_aug_path
         self.dev_path = dev_path
         self.test_path = test_path
         self.predict_path = predict_path
@@ -122,7 +123,7 @@ class Dataloader(pl.LightningDataModule):
     def setup(self, stage='fit'):
         if stage == 'fit':
             # 학습 데이터와 검증 데이터셋을 호출합니다
-            train_data = pd.read_csv(self.train_path)
+            train_data = pd.read_csv(self.train_aug_path)
             val_data = pd.read_csv(self.dev_path)
 
             # 학습데이터 준비
@@ -181,7 +182,7 @@ class Model(pl.LightningModule):
         logits = self(x)
         loss = self.loss_func(logits, y.float())
         self.log("train_loss", loss)
-        wandb.log({"Training loss": loss})
+        wandb.log({"Training loss": loss}, step=self.current_epoch)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -189,9 +190,11 @@ class Model(pl.LightningModule):
         logits = self(x)
         loss = self.loss_func(logits, y.float())
         self.log("val_loss", loss)
-        wandb.log({"validation loss": loss})
+        wandb.log({"validation loss": loss}, step=self.current_epoch)
         self.log("val_pearson", torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze()))
-        wandb.log({"validation pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())})
+        wandb.log({"validation pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())},
+                   step=self.current_epoch)        
+        
         return loss
 
     def test_step(self, batch, batch_idx):
@@ -199,8 +202,7 @@ class Model(pl.LightningModule):
         logits = self(x)
 
         self.log("test_pearson", torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze()))
-        wandb.log({"test_pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())})
-
+        wandb.log({"test_pearson": torchmetrics.functional.pearson_corrcoef(logits.squeeze(), y.squeeze())}, step=self.current_epoch)
     def predict_step(self, batch, batch_idx):
         x = batch
         logits = self(x)
@@ -218,7 +220,7 @@ if __name__ == '__main__':
     # 실행 시 '--batch_size=64' 같은 인자를 입력하지 않으면 default 값이 기본으로 실행됩니다
     # dataloader와 model을 생성합니다.
     dataloader = Dataloader(config["model_params"]["model_name"], config["model_params"]["batch_size"],
-                            config["model_params"]["shuffle"], config["paths"]["train_path"], 
+                            config["model_params"]["shuffle"], config["paths"]["train_aug_path"], 
                             config["paths"]["dev_path"],config["paths"]["test_path"],config["paths"]["predict_path"])
     model = Model(config["model_params"]["model_name"], float(config["model_params"]["learning_rate"]))
 
