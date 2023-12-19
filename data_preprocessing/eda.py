@@ -4,6 +4,7 @@ import pickle
 import re
 import yaml
 
+
 def load_config(config_file):
     with open(config_file) as file:
         config = yaml.safe_load(file)
@@ -164,10 +165,10 @@ def EDA(sentence, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=2)
 		a_words = random_swap(words, n_rs)
 		augmented_sentences.append(" ".join(a_words))
 
-	# # rd - 랜덤 삭제
-	# for _ in range(num_new_per_technique):
-	# 	a_words = random_deletion(words, p_rd)
-	# 	augmented_sentences.append(" ".join(a_words))
+	# rd - 랜덤 삭제
+	for _ in range(num_new_per_technique):
+		a_words = random_deletion(words, p_rd)
+		augmented_sentences.append(" ".join(a_words))
 
 	augmented_sentences = [get_only_hangul(sentence) for sentence in augmented_sentences]
 	random.shuffle(augmented_sentences)
@@ -184,9 +185,8 @@ def EDA(sentence, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=2)
 
 augmented_sentences_1 = []
 augmented_sentences_2 = []
-df_len = len(df.index)
 
-for i in range(0, df_len):
+for i in range(0, 9324):
     augmented_sentences_1.append(EDA(df["sentence_1"][i])[1])
     augmented_sentences_2.append(EDA(df["sentence_2"][i])[1])
           
