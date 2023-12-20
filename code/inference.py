@@ -12,7 +12,11 @@ import torch
 import torchmetrics
 import pytorch_lightning as pl
 
-import phrase_hh
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+from data_preprocessing import grammar_check
 
 # config file 세팅
 import yaml
@@ -21,7 +25,7 @@ def load_config(config_file):
         config = yaml.safe_load(file)
     return config
 
-config = load_config("config_2.yaml")
+config = load_config("config.yaml")
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, inputs, targets=[]):
@@ -42,13 +46,13 @@ class Dataset(torch.utils.data.Dataset):
 
 
 class Dataloader(pl.LightningDataModule):
-    def __init__(self, model_name, batch_size, shuffle, train_path, dev_path, test_path, predict_path):
+    def __init__(self, model_name, batch_size, shuffle, train_aug_path, dev_path, test_path, predict_path):
         super().__init__()
         self.model_name = model_name
         self.batch_size = batch_size
         self.shuffle = shuffle
 
-        self.train_path = train_path
+        self.train_aug_path = train_aug_path
         self.dev_path = dev_path
         self.test_path = test_path
         self.predict_path = predict_path
@@ -66,9 +70,11 @@ class Dataloader(pl.LightningDataModule):
     def tokenizing(self, dataframe):
         data = []
         for idx, item in tqdm(dataframe.iterrows(), desc='tokenizing', total=len(dataframe)):
+            # 두 입력 문장을 정규화(교정)한 후,
+            # [SEP] 토큰으로 이어붙여서 전처리합니다.
+            #text = '[SEP]'.join([item[text_column] for text_column in self.text_columns])
             text1, text2 = (item[text_column] for text_column in self.text_columns)  # sentence_1, sentence_2 의미
-            text1, text2 = phrase_hh.remove_punc_and_emoticon(text1), phrase_hh.remove_punc_and_emoticon(text2)  # 문장부호 및 이모티콘 다듬기
-            text1, text2 = phrase_hh.check_naver(text1), phrase_hh.check_naver(text2)  # 네이버 맞춤법 검사기로 교정하기
+            text1, text2 = grammar_check.remove_punc_and_emoticon(text1), grammar_check.remove_punc_and_emoticon(text2)  # 문장부호 및 이모티콘 다듬기
             text = '[SEP]'.join([text1, text2])
             outputs = self.tokenizer(text, add_special_tokens=True, padding='max_length', truncation=True)
             data.append(outputs['input_ids'])
@@ -92,7 +98,7 @@ class Dataloader(pl.LightningDataModule):
     def setup(self, stage='fit'):
         if stage == 'fit':
             # 학습 데이터와 검증 데이터셋을 호출합니다
-            train_data = pd.read_csv(self.train_path)
+            train_data = pd.read_csv(self.train_aug_path)
             val_data = pd.read_csv(self.dev_path)
 
             # 학습데이터 준비
@@ -189,7 +195,7 @@ if __name__ == '__main__':
     # dataloader와 model을 생성합니다.
     dataloader = Dataloader(config["model_params"]["model_name"], config["model_params"]["batch_size"],
                             config["model_params"]["shuffle"], config["paths"]["train_aug_path"], 
-                            config["paths"]["dev_aug_path"],config["paths"]["test_aug_path"],config["paths"]["predict_path"])
+                            config["paths"]["dev_path"],config["paths"]["test_path"],config["paths"]["predict_path"])
 
     # gpu가 없으면 'gpus=0'을, gpu가 여러개면 'gpus=4'처럼 사용하실 gpu의 개수를 입력해주세요
     trainer = pl.Trainer(accelerator="gpu", devices=1, max_epochs=config["model_params"]["max_epoch"], log_every_n_steps=1)

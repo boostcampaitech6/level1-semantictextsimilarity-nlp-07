@@ -11,4 +11,4 @@ code/model/
 data/
 
 ### unnecessary files ###
-code/__pycache__/
+__pycache__/
