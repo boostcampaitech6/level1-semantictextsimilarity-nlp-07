@@ -28,5 +28,5 @@ train_df = eda_aug(train_df)
 val_df = eda_aug(val_df)
 
 # 데이터 저장
-train_df.to_csv('/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/data/processed_train.csv', index=False)
-val_df.to_csv('/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/data/processed_dev.csv', index=False)
+train_df.to_csv('/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/data/eda_processed_train.csv', index=False)
+val_df.to_csv('/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/data/eda_processed_dev.csv', index=False)

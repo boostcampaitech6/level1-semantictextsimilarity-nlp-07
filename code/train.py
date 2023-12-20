@@ -247,7 +247,7 @@ if __name__ == '__main__':
     model = Model(config["model_params"]["model_name"], float(config["model_params"]["learning_rate"]))
 
     # gpu가 없으면 accelerator="cpu"로 변경해주세요, gpu가 여러개면 'devices=4'처럼 사용하실 gpu의 개수를 입력해주세요
-    trainer = pl.Trainer(accelerator="gpu", devices=1, max_epochs=config["model_params"]["max_epoch"], log_every_n_steps=1)
+    trainer = pl.Trainer(accelerator="gpu", devices=1, max_epochs=config["model_params"]["max_epoch"], log_every_n_steps=1, gradient_clip_val=0.5)
 
     # Train part
     trainer.fit(model=model, datamodule=dataloader)

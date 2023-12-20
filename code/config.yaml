@@ -5,7 +5,7 @@ paths:
   dev_path: '../data/eda_processed_dev.csv'
   test_path: '../data/eda_processed_dev.csv'
   predict_path: '../data/test.csv'
-  model_path: './model/wed_kykim_electra-kor-base_L1_lr1e-5_b16_e50.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
+  model_path: './model/gc_kykim_electra-kor-base_nadam_mse_lr3e-5_b16_e50.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
   output_path: '../data/output/'
 
 model_params: 
@@ -20,4 +20,4 @@ wandb_params:
   entity: 'junior-naver'
   allow_val_change: True
   dataset: 'default data'
-  run_name: 'wed_kykim_electra-kor-base_L1_lr1e-5_b16_e50' #wandb에 표시될 모델 버전의 이름
+  run_name: 'gc_kykim_electra-kor-base_nadam_mse_lr3e-5_b16_e50' #wandb에 표시될 모델 버전의 이름
