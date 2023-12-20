@@ -22,6 +22,7 @@ import transformers
 import torch
 import torchmetrics
 import pytorch_lightning as pl
+import time
 
 import phrase_hh
 
@@ -75,11 +76,8 @@ class Dataloader(pl.LightningDataModule):
     def tokenizing(self, dataframe):
         data = []
         for idx, item in tqdm(dataframe.iterrows(), desc='tokenizing', total=len(dataframe)):
-            text1, text2 = (item[text_column] for text_column in self.text_columns)  # sentence_1, sentence_2 의미
-            text1, text2 = phrase_hh.remove_punc_and_emoticon(text1), phrase_hh.remove_punc_and_emoticon(text2)  # 문장부호 및 이모티콘 다듬기
-            text1, text2 = phrase_hh.check_naver(text1), phrase_hh.check_naver(text2)  # 네이버 맞춤법 검사기로 교정하기
-            text = '[SEP]'.join([text1, text2])
-            outputs = self.tokenizer(text, add_special_tokens=True, padding='max_length', truncation=True)
+            text = '[SEP]'.join([item[text_column] for text_column in self.text_columns])
+            outputs = self.tokenizer(text, add_special_tokens=True, padding='max_length', max_length=160, truncation=True)
             data.append(outputs['input_ids'])
         return data
 
@@ -146,8 +144,8 @@ class Model(pl.LightningModule):
         # 사용할 모델을 호출합니다.
         self.plm = transformers.AutoModelForSequenceClassification.from_pretrained(
             pretrained_model_name_or_path=model_name, num_labels=1)
-        # Loss 계산을 위해 사용될 L1Loss를 호출합니다.
-        self.loss_func = torch.nn.L1Loss()
+        # Loss 계산을 위해 사용될 MSELoss를 호출합니다.
+        self.loss_func = torch.nn.MSELoss()
 
     def forward(self, x):
         x = self.plm(x)['logits']
@@ -187,7 +185,7 @@ class Model(pl.LightningModule):
         return logits.squeeze()
 
     def configure_optimizers(self):
-        optimizer = torch.optim.AdamW(self.parameters(), lr=self.lr)
+        optimizer = torch.optim.NAdam(self.parameters(), lr=self.lr)
         return optimizer
 
 
@@ -196,7 +194,9 @@ class Model(pl.LightningModule):
 
 
 if __name__ == '__main__':
-    for i in range(1,5):
+    for i in range(2,3):
+        torch.cuda.empty_cache()
+        time.sleep(5)
         config = load_config(f"config_{i}.yaml")
 
         # seed 고정
@@ -218,6 +218,7 @@ if __name__ == '__main__':
             "dataset": config["wandb_params"]["dataset"],
             "epochs": config["model_params"]["max_epoch"],
             "loss": config["wandb_params"]["loss"],
+            "optimizer" : config["wandb_params"]["optimizer"],
             }
         )
         wandb.run.name = config["wandb_params"]["run_name"]

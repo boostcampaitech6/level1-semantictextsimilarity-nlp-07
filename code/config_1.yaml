@@ -7,13 +7,13 @@ paths:
   test_aug_path: '../data/dev.csv'
   test_path: '../data/processed_dev.csv'
   predict_path: '../data/test.csv'
-  model_path: './model/test1.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
+  model_path: './model/daekeun-ml-koelectra-small-v3-korsts.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
   output_path: '../data/output/'
 
 model_params: 
-  model_name: 'beomi/KcELECTRA-small-v2022'
+  model_name: 'daekeun-ml/koelectra-small-v3-korsts'
   batch_size: 16
-  max_epoch: 2
+  max_epoch: 50
   shuffle: True
   learning_rate: 1e-5
   
@@ -22,5 +22,5 @@ wandb_params:
   entity: 'junior-naver'
   allow_val_change: True
   dataset: 'default data'
-  run_name: 'test1' #wandb에 표시될 모델 버전의 이름
+  run_name: 'daekeun-ml-koelectra-small-v3-korsts' #wandb에 표시될 모델 버전의 이름
   loss: 'L1'
