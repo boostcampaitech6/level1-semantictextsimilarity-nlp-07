@@ -2,7 +2,7 @@
 paths:
   train_path: '../data/train.csv'
   train_trans_path: '../data/train_translated.csv'
-  train_aug_path: '../data/eda_processed_train.csv'
+  train_aug_path: '../data/final_processed_train.csv'
   dev_path: '../data/final_processed_dev.csv'
   test_path: '../data/final_processed_dev.csv'
   predict_path: '../data/test.csv'
