@@ -16,8 +16,8 @@ def load_config(config_file):
 config = load_config("/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/code/config.yaml")
 
 # Down sampling 및 validation data processing
-train_df = down_sample(config, data_name="train_trans_path")
-val_df = pd.read_csv(config["paths"]["dev_path"])
+train_df = down_sample(config, data_name="train_process_path")
+val_df = pd.read_csv(config["paths"]["dev_process_path"])
 add_df = train_df.sample(frac=0.15, random_state=123, ignore_index=True)  # 합쳤을 때 대략 20%가 될 수 있게 15%를 가져옴 (original val data는 6% 정도)
 
 train_df = train_df[~train_df.index.isin(add_df.index)].reset_index()   # val에 들어 갈 데이터 train에서 빼주기

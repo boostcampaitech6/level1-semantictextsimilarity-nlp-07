@@ -1,7 +1,8 @@
 # config.yaml
 paths:
   train_path: '../data/train.csv'
-  train_trans_path: '../data/train_translated.csv'
+  train_process_path: '../data/train_translated.csv'
+  dev_process_path: '../data/dev.csv'
   train_aug_path: '../data/final_processed_train.csv'
   dev_path: '../data/final_processed_dev.csv'
   test_path: '../data/final_processed_dev.csv'
