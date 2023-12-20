@@ -8,7 +8,7 @@ paths:
   model_path: './model/kykim_electra-kor-base_L1_lr1e-5_b16_e30_rmsprop.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
   output_path: '../data/output/'
 
-model_params: 
+model_params: dd
   model_name: 'kykim/electra-kor-base'
   batch_size: 16
   max_epoch: 30
