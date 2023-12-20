@@ -230,9 +230,7 @@ class Model(pl.LightningModule):
         return logits.squeeze()
 
     def configure_optimizers(self):
-        optimizer = torch.optim.AdamW(self.parameters(), lr=self.lr)
-        # AdamW 대신 NAdam 넣기
-        #optimizer = torch.optim.NAdam(self.parameters(), lr=self.lr)
+        optimizer = torch.optim.RMSprop(self.parameters(), lr=self.lr)
         return optimizer
 
 
