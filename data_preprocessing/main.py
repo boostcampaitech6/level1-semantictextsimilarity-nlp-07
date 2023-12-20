@@ -16,7 +16,7 @@ def load_config(config_file):
 config = load_config("/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/code/config.yaml")
 
 # Down sampling 및 validation data processing
-train_df = down_sample(config, data_name="train_path")
+train_df = down_sample(config, data_name="train_trans_path")
 val_df = pd.read_csv(config["paths"]["dev_path"])
 add_df = train_df.sample(frac=0.15, random_state=123, ignore_index=True)  # 합쳤을 때 대략 20%가 될 수 있게 15%를 가져옴 (original val data는 6% 정도)
 
@@ -28,5 +28,5 @@ train_df = eda_aug(train_df)
 val_df = eda_aug(val_df)
 
 # 데이터 저장
-train_df.to_csv('/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/data/eda_processed_train.csv', index=False)
-val_df.to_csv('/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/data/eda_processed_dev.csv', index=False)
+train_df.to_csv('/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/data/final_processed_train.csv', index=False)
+val_df.to_csv('/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/data/final_processed_dev.csv', index=False)
