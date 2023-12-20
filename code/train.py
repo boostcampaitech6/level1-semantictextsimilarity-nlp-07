@@ -76,8 +76,11 @@ class Dataloader(pl.LightningDataModule):
     def tokenizing(self, dataframe):
         data = []
         for idx, item in tqdm(dataframe.iterrows(), desc='tokenizing', total=len(dataframe)):
-            text = '[SEP]'.join([item[text_column] for text_column in self.text_columns])
-            outputs = self.tokenizer(text, add_special_tokens=True, padding='max_length', max_length=160, truncation=True)
+            text1, text2 = (item[text_column] for text_column in self.text_columns)  # sentence_1, sentence_2 의미
+            text1, text2 = phrase_hh.remove_punc_and_emoticon(text1), phrase_hh.remove_punc_and_emoticon(text2)  # 문장부호 및 이모티콘 다듬기
+            text1, text2 = phrase_hh.check_naver(text1), phrase_hh.check_naver(text2)  # 네이버 맞춤법 검사기로 교정하기
+            text = '[SEP]'.join([text1, text2])
+            outputs = self.tokenizer(text, add_special_tokens=True, padding='max_length', truncation=True)
             data.append(outputs['input_ids'])
         return data
 
@@ -144,7 +147,7 @@ class Model(pl.LightningModule):
         # 사용할 모델을 호출합니다.
         self.plm = transformers.AutoModelForSequenceClassification.from_pretrained(
             pretrained_model_name_or_path=model_name, num_labels=1)
-        # Loss 계산을 위해 사용될 MSELoss를 호출합니다.
+        # Loss 계산을 위해 사용될 Loss를 호출합니다.
         self.loss_func = torch.nn.MSELoss()
 
     def forward(self, x):
@@ -229,8 +232,8 @@ if __name__ == '__main__':
         # 실행 시 '--batch_size=64' 같은 인자를 입력하지 않으면 default 값이 기본으로 실행됩니다
         # dataloader와 model을 생성합니다.
         dataloader = Dataloader(config["model_params"]["model_name"], config["model_params"]["batch_size"],
-                                config["model_params"]["shuffle"], config["paths"]["train_path"], 
-                                config["paths"]["dev_path"],config["paths"]["test_path"],config["paths"]["predict_path"])
+                                config["model_params"]["shuffle"], config["paths"]["train_aug_path"], 
+                                config["paths"]["dev_aug_path"],config["paths"]["test_aug_path"],config["paths"]["predict_path"])
         model = Model(config["model_params"]["model_name"], float(config["model_params"]["learning_rate"]))
 
         # gpu가 없으면 accelerator="cpu"로 변경해주세요, gpu가 여러개면 'devices=4'처럼 사용하실 gpu의 개수를 입력해주세요
