@@ -27,9 +27,9 @@
 - **팀 구성 및 컴퓨팅 환경**
   - 6인 1팀, 인당 V100 서버를 VSCode와 SSH로 연결하여 사용
 - **협업 환경**
-  - Notion, GitHub, WandB
+  - ![notion](https://img.shields.io/badge/notion-FFFFFF?style=flat-square&logo=notion&logoColor=black) ![github](https://img.shields.io/badge/github-181717?style=flat-square&logo=github&logoColor=white) ![WandB](https://img.shields.io/badge/weightsandbiases-FFBE00?style=flat-square&logo=weightsandbiases&logoColor=white)
 - **의사소통**
-  - Zoom, Slack
+  - ![zoom](https://img.shields.io/badge/zoom-0B5CFF?style=flat-square&logo=zoom&logoColor=white) ![slack](https://img.shields.io/badge/slack-4A154B?style=flat-square&logo=slack&logoColor=white)
 - **버전 정보**
   - transformers==4.35.2 pytorch-lightning==2.1.2 pandas==2.1.3
   
