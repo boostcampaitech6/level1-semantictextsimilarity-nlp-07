@@ -35,7 +35,7 @@
   
 ## 📈 사용 데이터
 |데이터|사용 데이터셋|목적|구성|
-|:---|:---|:---|:---|
+|---|---|---|---|
 |학습 데이터|훈련 데이터(train.csv) 및 검증 데이터(dev.csv)|학습 데이터셋에 기반한 모델(model.pt) 생성|색인(index)<br>문장 출처(source)<br>비교할 문장(sentence_1, sentence_2)<br>0.0~5.0까지의 연관도(label)<br>연관도를 binary하게 나타낸 값(binary_level)|
 |평가 데이터|평가 데이터(test.csv)|학습 데이터 및 모델에 기반한 두 문장 간 연관도(label) 예측|색인(index)<br>문장 출처(source)<br>비교할 문장(sentence_1, sentence_2)|
 
