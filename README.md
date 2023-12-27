@@ -43,15 +43,10 @@
 ```
 .
 |-- code
-|   |-- __pycache__
-|   |-- config.py
-|   |-- config.yaml
 |   |-- inference.py
-|   |-- lightning_logs
 |   |-- model
 |   |-- requirements.txt
-|   |-- train.py
-|   `-- wandb
+|   `-- train.py
 |-- data
 |   |-- dev.csv
 |   |-- output
@@ -59,7 +54,6 @@
 |   |-- test.csv
 |   `-- train.csv
 `-- data_preprocessing
-    |-- __pycache__
     |-- back_translation.py
     |-- down_sampling.py
     |-- eda.py
