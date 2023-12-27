@@ -40,4 +40,30 @@
 |평가 데이터|평가 데이터(test.csv)|학습 데이터 및 모델에 기반한 두 문장 간 연관도(label) 예측|색인(index)<br>문장 출처(source)<br>비교할 문장(sentence_1, sentence_2)|
 
 ## 🖇️ 파일 구조
-  - 
+```
+.
+|-- code
+|   |-- __pycache__
+|   |-- config.py
+|   |-- config.yaml
+|   |-- inference.py
+|   |-- lightning_logs
+|   |-- model
+|   |-- requirements.txt
+|   |-- train.py
+|   `-- wandb
+|-- data
+|   |-- dev.csv
+|   |-- output
+|   |-- sample_submission.csv
+|   |-- test.csv
+|   `-- train.csv
+`-- data_preprocessing
+    |-- __pycache__
+    |-- back_translation.py
+    |-- down_sampling.py
+    |-- eda.py
+    |-- grammar_check.py
+    |-- main.py
+    `-- wordnet.pickle
+```
