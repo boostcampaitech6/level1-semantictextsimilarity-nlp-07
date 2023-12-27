@@ -67,3 +67,63 @@
     |-- main.py
     `-- wordnet.pickle
 ```
+
+## Appendix
+<details><summary>
+  
+  ### 🔧 ```KeyError: 'result'``` 문제 해결하기(py-hanspell 패키지 관련 문제)
+  
+  </summary>
+  
+#### 원인
+
+* 네이버 맞춤법 검사기가 업데이트되어 패키지 차원에서 ```passportKey```와 ```callback``` 변수를 제공해야 하지만, py-hanspell 패키지가 업데이트되지 않아 발생한 문제
+
+#### 해결 방법
+
+1. ```.../lib/python3.10/site-packages/hanspell/spell_checker.py``` 부분을 ```Ctrl``` + 클릭하여 패키지 파일 들어가기
+2. 네이버 맞춤법 검사기에서 ```passportKey```, ```_callback``` 변수값을 copy하기
+3. ```spell_checker.py``` 패키지 파일 수정하기
+
+    1. 개발자 툴을 지원하는 브라우저(예: Chrome)로 [네이버 맞춤법 검사기 링크](https://search.naver.com/search.naver?where=nexearch&query=%EB%84%A4%EC%9D%B4%EB%B2%84+%EB%A7%9E%EC%B6%A4%EB%B2%95+%EA%B2%80%EC%82%AC%EA%B8%B0&ie=utf8&sm=tab_she&qdt=0)에 접속한 후 ```F12``` 버튼 눌러 개발자 툴 들어가기
+    2. 개발자 툴에서 ```Network``` 채널 버튼 클릭하기
+       ![Untitled](https://github.com/boostcampaitech6/level1-semantictextsimilarity-nlp-07/assets/153268935/8cd40659-8d70-49eb-8897-a8b51aa64e6a)
+    3. 맞춤법 검사기에 아무 문구를 넣고 ```Network``` 채널 창에 "spell" 검색하기
+       ![Untitled](https://github.com/boostcampaitech6/level1-semantictextsimilarity-nlp-07/assets/153268935/4245b1cc-e848-4c35-a29a-47c333ba8c92)
+    4. ```SpellerProxy?…``` 변수를 클릭하여 ```Header``` 채널의 ```RequestURL``` 변수를 확인하기
+    5. ```RequestURL``` 변수에서 ```passportKey``` 및 ```_callback``` 변수값을 복사하기
+       ![Untitled](https://github.com/boostcampaitech6/level1-semantictextsimilarity-nlp-07/assets/153268935/90608c61-ee20-4b65-96e2-53b83c112d80)
+       여기서는 ```passportKey=db951c57dce59ab5bda4148db8a11fe7e1277e6a```, ```_callback=jQuery112407861628390335917_1702639286516```라 나옴.
+   6. ```spell_checker.py```로 돌아가 아래와 같이 수정하기
+      * 수정 전
+        ```python
+        ...
+        
+        data = json.loads(r.text)
+        
+        ...
+        
+        payload = {'q': text, 'color_blindness': '0' }
+        
+        ...
+        ```
+      * 수정 후
+        ```python
+        ...
+        
+        import re
+        json_data = re.search(r'\((.*)\)', r.text).group(1)
+        data = json.loads(json_data)
+        
+        ...
+        
+        payload = {'passportKey': 'curl값 copy하기',
+					  '_callback': 'curl값 copy하기',
+					  'q': text,
+					  'color_blindness': '0' }
+        
+        ...
+        ```
+
+  
+</details>
