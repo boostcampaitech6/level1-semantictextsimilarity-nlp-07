@@ -3,10 +3,10 @@ paths:
   train_path: '../data/train.csv'
   train_process_path: '../data/train.csv'
   dev_process_path: '../data/dev.csv'
-  train_aug_path: '../data/neda_train_trans_thirty.csv'
-  dev_path: '../data/npart_processed_dev.csv'
-  test_path: '../data/npart_processed_dev.csv'
-  predict_path: '../data/test.csv'
+  train_aug_path: '../data/final_train.csv'
+  dev_path: '../data/final_dev.csv'
+  test_path: '../data/final_dev.csv'
+  predict_path: '../data/final_test.csv'
   model_path: './model/neda_thirty_kykim_electra-kor-base_nadam_mse_lr1e-5_b16_e20.pt'  #pt파일로 저장될 모델의 경로와 파일 이름
   output_path: '../data/output/'
 
