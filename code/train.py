@@ -1,25 +1,7 @@
-
-# base model에 간단히 wandb를 연동하는 코드 블럭을 추가했습니다.
-# 아직 부족한 부분이 많을 수 있으니, 참고 용도로 사용하시는 걸 추천드립니다.
-# 저도 아직 배우는 중이라, 유용한 코드 수정 사항이나 문제 사항이 있으면 편하게 말씀해주세요!
-
-# pip install pyyaml으로 패키지를 설치 후 yaml에 접근할 수 있습니다.
-
-############# 수정한 코드 list #############
-# config file 세팅 블록
-# wandb init 블록
-# wandb log 찍는 라인들
-# config 쳤을 때 나오는 라인들
-# wandb finish 라인
-# import argparser 삭제
-
-
 import random
 import wandb
 import pandas as pd
-
 from tqdm.auto import tqdm
-
 import transformers
 import torch
 import torchmetrics
@@ -29,16 +11,10 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-from data_preprocessing import grammar_check
+from config import config
 
 # config file 세팅
-import yaml
-def load_config(config_file):
-    with open(config_file) as file:
-        config = yaml.safe_load(file)
-    return config
-
-config = load_config("config.yaml")
+config = config.load_config("config/config.yaml")
 
 # seed 고정
 torch.manual_seed(0)
@@ -239,8 +215,9 @@ if __name__ == '__main__':
     # 실행 시 '--batch_size=64' 같은 인자를 입력하지 않으면 default 값이 기본으로 실행됩니다
     # dataloader와 model을 생성합니다.
     dataloader = Dataloader(config["model_params"]["model_name"], config["model_params"]["batch_size"],
-                            config["model_params"]["shuffle"], config["paths"]["train_aug_path"], 
-                            config["paths"]["dev_path"],config["paths"]["test_path"],config["paths"]["predict_path"])
+                            config["model_params"]["shuffle"], config["your_path"]+config["paths"]["train_aug_path"], 
+                            config["your_path"]+config["paths"]["dev_path"],config["your_path"]+config["paths"]["test_path"],
+                            config["your_path"]+config["paths"]["predict_path"])
     model = Model(config["model_params"]["model_name"], float(config["model_params"]["learning_rate"]))
 
     # gpu가 없으면 accelerator="cpu"로 변경해주세요, gpu가 여러개면 'devices=4'처럼 사용하실 gpu의 개수를 입력해주세요
@@ -251,7 +228,7 @@ if __name__ == '__main__':
     trainer.test(model=model, datamodule=dataloader)
 
     # 학습이 완료된 모델을 저장합니다.
-    torch.save(model, config["paths"]["model_path"])
+    torch.save(model, config["your_path"]+config["paths"]["model_path"])
 
     # [optional] finish the wandb run, necessary in notebooks
     wandb.finish()

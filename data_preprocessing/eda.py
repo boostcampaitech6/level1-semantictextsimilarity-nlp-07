@@ -2,18 +2,12 @@ import pandas as pd
 import random
 import pickle
 import re
-import yaml
-
-import yaml
-def load_config(config_file):
-    with open(config_file) as file:
-        config = yaml.safe_load(file)
-    return config
-
-config = load_config("/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/code/config.yaml")
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 wordnet = {}
-with open("wordnet.pickle", "rb") as f:
+with open("data_preprocessing/wordnet.pickle", "rb") as f:
 	wordnet = pickle.load(f)
 
 # 한글만 남기고 나머지는 삭제

@@ -1,7 +1,7 @@
-# hanspell 설치: pip3 install git+https://github.com/ssut/py-hanspell.git
 from hanspell import spell_checker
 import re
 from tqdm.auto import tqdm
+
 
 def remove_punc_and_emoticon(wrongSent):  # 문장부호 및 간단한 이모티콘 다듬기
     sent = wrongSent
@@ -23,8 +23,6 @@ def remove_punc_and_emoticon(wrongSent):  # 문장부호 및 간단한 이모티
     return sent
 
 def check_naver(wrongSent):  # 네이버 맞춤법 교정
-    # 오류 시 다음 링크 참조: https://github.com/ssut/py-hanspell/issues/41
-    # 또는 다음 노션 페이지 참조: https://www.notion.so/Naver-11bd887e891d46f5bee9c6a7a79ca02d?pvs=4
     spelled_sent = spell_checker.check(wrongSent)
     checked_sent = spelled_sent.checked
     return checked_sent

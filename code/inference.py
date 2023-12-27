@@ -1,31 +1,17 @@
-############# 수정한 코드 list #############
-# config file 세팅 블록
-# config 쳤을 때 나오는 라인들
-# import argparser 삭제
-
 import pandas as pd
-
 from tqdm.auto import tqdm
-
 import transformers
 import torch
 import torchmetrics
 import pytorch_lightning as pl
-
 import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-from data_preprocessing import grammar_check
+from config import config
 
 # config file 세팅
-import yaml
-def load_config(config_file):
-    with open(config_file) as file:
-        config = yaml.safe_load(file)
-    return config
-
-config = load_config("config.yaml")
+config = config.load_config("config/config.yaml")
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, inputs, targets=[]):
@@ -192,15 +178,16 @@ if __name__ == '__main__':
 
     # dataloader와 model을 생성합니다.
     dataloader = Dataloader(config["model_params"]["model_name"], config["model_params"]["batch_size"],
-                            config["model_params"]["shuffle"], config["paths"]["train_aug_path"], 
-                            config["paths"]["dev_path"],config["paths"]["test_path"],config["paths"]["predict_path"])
+                            config["model_params"]["shuffle"], config["your_path"]+config["paths"]["train_aug_path"], 
+                            config["your_path"]+config["paths"]["dev_path"],config["your_path"]+config["paths"]["test_path"],
+                            config["your_path"]+config["paths"]["predict_path"])
 
     # gpu가 없으면 'gpus=0'을, gpu가 여러개면 'gpus=4'처럼 사용하실 gpu의 개수를 입력해주세요
     trainer = pl.Trainer(accelerator="gpu", devices=1, max_epochs=config["model_params"]["max_epoch"], log_every_n_steps=1)
 
     # Inference part
     # 저장된 모델로 예측을 진행합니다.
-    model = torch.load(config["paths"]["model_path"])
+    model = torch.load(config["your_path"]+config["paths"]["model_path"])
     predictions = trainer.predict(model=model, datamodule=dataloader)
 
     # 예측된 결과를 형식에 맞게 반올림하여 준비합니다.
@@ -209,4 +196,4 @@ if __name__ == '__main__':
     # output 형식을 불러와서 예측된 결과로 바꿔주고, run_name+output.csv로 출력합니다.
     output = pd.read_csv('../data/sample_submission.csv')
     output['target'] = predictions
-    output.to_csv(config["paths"]["output_path"]+config["wandb_params"]["run_name"]+'_output.csv', index=False)
+    output.to_csv(config["your_path"]+config["paths"]["output_path"]+config["wandb_params"]["run_name"]+'_output.csv', index=False)
