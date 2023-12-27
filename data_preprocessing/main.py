@@ -25,7 +25,7 @@ val_df = pd.concat([val_df, add_df], ignore_index=True)     # val과 train에서
 
 # EDA
 train_df = eda_aug(train_df)
-val_df = eda_aug(val_df)
+# val_df = eda_aug(val_df)
 
 # 데이터 저장
 train_df.to_csv('/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/data/final_processed_train.csv', index=False)
