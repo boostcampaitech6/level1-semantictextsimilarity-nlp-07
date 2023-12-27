@@ -42,11 +42,18 @@
 ## 🖇️ 파일 구조
 ```
 .
+|-- README.md
 |-- code
+|   |-- __pycache__
 |   |-- inference.py
+|   |-- lightning_logs
 |   |-- model
 |   |-- requirements.txt
-|   `-- train.py
+|   |-- train.py
+|   `-- wandb
+|-- config
+|   |-- config.py
+|   `-- config.yaml
 |-- data
 |   |-- dev.csv
 |   |-- output
@@ -54,6 +61,7 @@
 |   |-- test.csv
 |   `-- train.csv
 `-- data_preprocessing
+    |-- __pycache__
     |-- back_translation.py
     |-- down_sampling.py
     |-- eda.py
