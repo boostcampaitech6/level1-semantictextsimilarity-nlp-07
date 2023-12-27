@@ -31,7 +31,7 @@
 - **의사소통**
   - ![zoom](https://img.shields.io/badge/Zoom-0B5CFF?style=flat-square&logo=Zoom&logoColor=white) ![slack](https://img.shields.io/badge/Slack-4A154B?style=flat-square&logo=Slack&logoColor=white)
 - **버전 정보**
-  - transformers==4.35.2 pytorch-lightning==2.1.2 pandas==2.1.3
+  - transformers==4.35.2 pytorch-lightning==2.1.2 pandas==2.1.3 wandb deep-translator==1.11.4
   
 ## 📈 사용 데이터
 |데이터|사용 데이터셋|목적|구성|
