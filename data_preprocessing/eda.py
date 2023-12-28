@@ -2,18 +2,12 @@ import pandas as pd
 import random
 import pickle
 import re
-import yaml
-
-import yaml
-def load_config(config_file):
-    with open(config_file) as file:
-        config = yaml.safe_load(file)
-    return config
-
-config = load_config("/data/ephemeral/home/level1-semantictextsimilarity-nlp-07/code/config.yaml")
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 wordnet = {}
-with open("wordnet.pickle", "rb") as f:
+with open("data_preprocessing/wordnet.pickle", "rb") as f:
 	wordnet = pickle.load(f)
 
 # 한글만 남기고 나머지는 삭제
@@ -164,9 +158,9 @@ def EDA(sentence, alpha_sr=0.1, alpha_ri=0.1, alpha_rs=0.1, p_rd=0.1, num_aug=2)
 		augmented_sentences.append(" ".join(a_words))
 
 	# rd - 랜덤 삭제
-	for _ in range(num_new_per_technique):
-		a_words = random_deletion(words, p_rd)
-		augmented_sentences.append(" ".join(a_words))
+	# for _ in range(num_new_per_technique):
+	# 	a_words = random_deletion(words, p_rd)
+	# 	augmented_sentences.append(" ".join(a_words))
 
 	augmented_sentences = [get_only_hangul(sentence) for sentence in augmented_sentences]
 	random.shuffle(augmented_sentences)
